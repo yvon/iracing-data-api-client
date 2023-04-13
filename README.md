@@ -1,7 +1,7 @@
 # IracingStats
 
 A simple Iracing data API client in Elixir.
-It follows links and consolidate chunks.
+It follows links and it consolidates data chunks.
 
 Refer to [Iracing forum post](https://forums.iracing.com/discussion/15068/general-availability-of-data-api/p1)
 for all available endpoints.
