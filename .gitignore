@@ -24,3 +24,5 @@ iracing_stats-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+data.txt
+cache
