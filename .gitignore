@@ -29,4 +29,4 @@ iracing_stats-*.tar
 /cache
 
 # Generated files
-/public_html
+/public_html/*.svg
