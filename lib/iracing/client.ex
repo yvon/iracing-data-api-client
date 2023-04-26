@@ -50,16 +50,16 @@ defmodule Iracing.Client do
     end)
   end
 
-  defp follow_links(%{"data" => %{"chunk_info" => chunk_info}}) do
+  defp follow_links(%{data: %{chunk_info: chunk_info}}) do
     %{
-      "base_download_url" => base_download_url,
-      "chunk_file_names" => chunk_file_names
+      base_download_url: base_download_url,
+      chunk_file_names: chunk_file_names
     } = chunk_info
 
     download_and_merge_chunks(base_download_url, chunk_file_names)
   end
 
-  defp follow_links(%{"link" => link}) do
+  defp follow_links(%{link: link}) do
     api().get(link)
   end
 

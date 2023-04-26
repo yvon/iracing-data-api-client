@@ -1,6 +1,5 @@
 reset
-set output "public_html/best_laps.svg"
-set timestamp "%d/%m/%y %H:%M"
+set timestamp "%d/%m/%y %H:%M GMT"
 set term svg size 1000,500
 set view map
 set tics nomirror

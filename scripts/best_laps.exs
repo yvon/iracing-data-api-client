@@ -4,39 +4,38 @@ defmodule GenerateData do
   # Races
   @event_types 5
 
-  def spawn_link(email, password) do
-    parent = self()
-    spawn_link(fn -> run(parent, email, password) end)
-  end
-
-  def run(parent, email, password) do
+  def run(email, password) do
     {:ok, client} = Iracing.Client.start_link({email, password})
 
     %{
-      "season_year" => year,
-      "season_quarter" => quarter,
-      "race_week" => week
+      season_year: year,
+      season_quarter: quarter,
+      race_week: week
     } = current_season(client)
 
-    info("#{year} S#{quarter} W#{week}")
+    IO.puts("#{year} S#{quarter} W#{week}")
     search_series = search_series(client, year, quarter, week)
 
-    # TODO: concurrency
-    for %{"subsession_id" => subsession_id} <- search_series,
-        session <- results(client, subsession_id)["session_results"],
-        session["simsession_type_name"] == "Race",
-        result <- session["results"],
-        result["drop_race"] == false,
-        result["average_lap"] > 0,
-        result["car_class_short_name"] == "IMSA23",
-        result["class_interval"] > 0,
-        do: send(parent, "#{result["oldi_rating"]} #{result["best_lap_time"]}")
+    stream =
+      Task.async_stream(search_series, fn subsession ->
+        results(client, subsession.subsession_id)
+      end)
 
-    send(parent, :done)
-  end
-
-  defp info(msg) do
-    IO.puts(:stderr, msg)
+    for {:ok, data} <- stream,
+        session <- data.session_results,
+        # Exclude pratices and qualifications
+        session.simsession_type_name == "Race",
+        result <- session.results,
+        # Members who finished the race
+        result.drop_race == false,
+        # Under the winner lap
+        result.class_interval > 0,
+        # Group results by car class
+        reduce: %{} do
+      acc ->
+        point = {result.oldi_rating, result.best_lap_time}
+        Map.update(acc, result.car_class_id, [], &[point | &1])
+    end
   end
 
   defp current_season(client) do
@@ -45,7 +44,7 @@ defmodule GenerateData do
   end
 
   defp matching_season?(data) do
-    data["series_id"] == @series_id and data["active"] == true
+    data.series_id == @series_id and data.active == true
   end
 
   defp search_series(client, year, quarter, week) do
@@ -70,15 +69,15 @@ defmodule GenerateData do
 
     case FileCache.get(cache_key) do
       nil ->
-        info("Fetching results from #{subsession_id} subsession")
+        IO.puts("Fetching results from #{subsession_id} subsession")
         query = [subsession_id: subsession_id]
         data = Iracing.Client.data(client, "/data/results/get", query)
         FileCache.cache(cache_key, Jason.encode!(data))
         data
 
       data ->
-        info("Reading cache data from #{subsession_id} subsession")
-        Jason.decode!(data)
+        IO.puts("Reading cache data from #{subsession_id} subsession")
+        Jason.decode!(data, keys: :atoms)
     end
   end
 
@@ -88,36 +87,31 @@ defmodule GenerateData do
 end
 
 defmodule Plot do
-  @script_path Path.join(__DIR__, "best_laps.gp")
+  @shared_script Path.join(__DIR__, "best_laps.gp")
 
-  def generate do
-    data_path = Path.join(System.tmp_dir!(), "data.gp")
-    generate_data(data_path)
-    {_, 0} = System.cmd("gnuplot", [data_path, @script_path], into: IO.stream())
+  def generate({basename, points}) do
+    path = write_gp_script(basename, points)
+    {_, 0} = System.cmd("gnuplot", [path, @shared_script], into: IO.stream())
   end
 
-  def generate_data(path) do
-    File.open(path, [:write], fn file ->
-      IO.puts(file, "$Data << EOD")
-      write_messages(file)
-      IO.puts(file, "EOD")
+  defp write_gp_script(basename, points) do
+    path = Path.join(System.tmp_dir!(), "#{basename}.gp")
+
+    File.open(path, [:write], fn f ->
+      IO.puts(f, "$Data << EOD")
+      Enum.each(points, fn {x, y} -> IO.puts(f, "#{x} #{y}") end)
+
+      IO.puts(f, """
+      EOD
+      set output "public_html/#{basename}.svg"
+      """)
     end)
-  end
 
-  defp write_messages(file) do
-    receive do
-      :done ->
-        :done
-
-      message ->
-        IO.puts(file, message)
-        write_messages(file)
-    end
+    path
   end
 end
 
 email = System.fetch_env!("IRACING_EMAIL")
 password = System.fetch_env!("IRACING_PASSWORD")
 
-GenerateData.spawn_link(email, password)
-Plot.generate()
+GenerateData.run(email, password) |> Enum.each(&Plot.generate/1)
