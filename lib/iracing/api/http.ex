@@ -6,7 +6,7 @@ defmodule Iracing.Api.Http do
       iex> %{"EMAIL" => email, "PASSWD" => passwd} = System.get_env
       iex> cookies = Iracing.Api.Http.authenticate(email, passwd)
       iex> profile = Iracing.Api.Http.get(cookies, "/data/member/profile")
-      iex> Map.has_key?(profile, "link")
+      iex> Map.has_key?(profile, :link)
       true
 
   """
