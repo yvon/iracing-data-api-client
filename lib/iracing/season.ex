@@ -9,6 +9,10 @@ defmodule Iracing.Season do
     GenServer.call(__MODULE__, :all)
   end
 
+  def active do
+    Enum.filter(all, fn season -> season.active end)
+  end
+
   @impl true
   def init([]) do
     {:ok, nil}
