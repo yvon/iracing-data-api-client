@@ -15,6 +15,7 @@ defmodule Iracing.MixProject do
   def application do
     [
       extra_applications: [:logger],
+      mod: {Iracing.Application, []},
       env: [
         api:
           case Mix.env() do
@@ -28,6 +29,7 @@ defmodule Iracing.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:plug_cowboy, "~> 2.6"},
       {:tesla, "~> 1.5"},
       {:hackney, "~> 1.18"},
       {:jason, "~> 1.4"}

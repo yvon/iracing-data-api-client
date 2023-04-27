@@ -31,4 +31,8 @@ defmodule Iracing.Api.Fake do
   def get("CHUNKS/DATA0") do
     [%{subsession_id: 42}]
   end
+
+  def get([@cookie], "/data/series/seasons", []) do
+    File.read!(Path.join(__DIR__, "fake/series/seasons.json")) |> Jason.decode!(keys: :atoms)
+  end
 end
