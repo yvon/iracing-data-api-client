@@ -9,6 +9,14 @@ defmodule Iracing.AuthenticatedClient do
     cookies() |> api().get(url, query) |> follow_links
   end
 
+  def cached_data(ttl, url, query \\ []) do
+    request = fn -> data(url, query) end
+    key = {url, query}
+    name = {:via, Registry, {:cached_data, key}}
+    GenServer.start(CachedContent, {request, ttl}, name: name)
+    CachedContent.get(name)
+  end
+
   @impl true
   def init([]) do
     email = Application.fetch_env!(:iracing, :email)

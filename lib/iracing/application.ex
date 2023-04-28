@@ -4,9 +4,8 @@ defmodule Iracing.Application do
 
   def start(_type, _args) do
     children = [
-      Iracing.AuthenticatedClient,
-      Iracing.Season,
-      {Plug.Cowboy, scheme: :http, plug: Iracing.Router, options: [port: 8080]}
+      {Registry, keys: :unique, name: :cached_data},
+      Iracing.AuthenticatedClient
     ]
 
     Logger.info("Starting application...")
