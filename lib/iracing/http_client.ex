@@ -8,7 +8,7 @@ defmodule Iracing.HttpClient do
 
   @client Tesla.client(@middleware, @adapter)
 
-  defp request(options) do
+  def request(options) do
     Tesla.request!(@client, options)
   end
 end

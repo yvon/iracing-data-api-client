@@ -3,7 +3,7 @@ defmodule Iracing.Application do
   require Logger
 
   def start(_type, _args) do
-    children = []
+    children = [Iracing.DataRegistry]
 
     Logger.info("Starting application...")
     Supervisor.start_link(children, strategy: :one_for_one)

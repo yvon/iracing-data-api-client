@@ -3,7 +3,7 @@ import Config
 credentials =
   case config_env() do
     :test ->
-      [email: "john@example.org", password: "secret"]
+      [email: "john@example.com", password: "secret"]
 
     _ ->
       [
