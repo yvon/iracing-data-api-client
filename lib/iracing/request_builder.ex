@@ -33,9 +33,7 @@ defmodule Iracing.RequestBuilder do
     client().request(method: :get, url: link).body
   end
 
-  defp follow_links(_, body) do
-    body
-  end
+  defp follow_links(body), do: body
 
   defp download_and_merge_chunks(base_download_url, chunks) do
     Enum.reduce(chunks, [], fn chunk, acc ->
