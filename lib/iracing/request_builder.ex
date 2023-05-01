@@ -1,45 +1,46 @@
 defmodule Iracing.RequestBuilder do
-  def authenticate(perform_request, email, password) do
+  def authenticate() do
     %{headers: headers} =
-      perform_request.(
+      client().request(
         method: :post,
         url: "/auth",
         body: %{
-          email: email,
-          password: hash_password(email, password)
+          email: email(),
+          password: hash_password()
         }
       )
 
     for {k, v} <- headers, k == "set-cookie", do: v
   end
 
-  def get(perform_request, cookies, url, query \\ []) do
+  def get(cookies, url, query \\ []) do
     headers = build_headers(cookies)
-    body = perform_request.(method: :get, url: url, query: query, headers: headers).body
-    follow_links(perform_request, body)
+
+    client().request(method: :get, url: url, query: query, headers: headers).body
+    |> follow_links
   end
 
-  defp follow_links(perform_request, %{data: %{chunk_info: chunk_info}}) do
+  defp follow_links(%{data: %{chunk_info: chunk_info}}) do
     %{
       base_download_url: base_download_url,
       chunk_file_names: chunk_file_names
     } = chunk_info
 
-    download_and_merge_chunks(perform_request, base_download_url, chunk_file_names)
+    download_and_merge_chunks(base_download_url, chunk_file_names)
   end
 
-  defp follow_links(perform_request, %{link: link}) do
-    perform_request.(method: :get, url: link).body
+  defp follow_links(%{link: link}) do
+    client().request(method: :get, url: link).body
   end
 
   defp follow_links(_, body) do
     body
   end
 
-  defp download_and_merge_chunks(perform_request, base_download_url, chunks) do
+  defp download_and_merge_chunks(base_download_url, chunks) do
     Enum.reduce(chunks, [], fn chunk, acc ->
       url = base_download_url <> chunk
-      acc ++ perform_request.(method: :get, url: url).body
+      acc ++ client().request(method: :get, url: url).body
     end)
   end
 
@@ -47,7 +48,11 @@ defmodule Iracing.RequestBuilder do
     Enum.map(cookies, fn v -> {"cookie", v} end)
   end
 
-  defp hash_password(email, password) do
-    :crypto.hash(:sha256, password <> email) |> Base.encode64()
+  defp hash_password() do
+    :crypto.hash(:sha256, password() <> email()) |> Base.encode64()
   end
+
+  defp email, do: Application.fetch_env!(:iracing, :email)
+  defp password, do: Application.fetch_env!(:iracing, :password)
+  defp client, do: Application.fetch_env!(:iracing, :client)
 end

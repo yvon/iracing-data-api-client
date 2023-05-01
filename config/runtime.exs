@@ -1,15 +1,9 @@
 import Config
 
-credentials =
-  case config_env() do
-    :test ->
-      [email: "john@example.com", password: "secret"]
-
-    _ ->
-      [
-        email: System.fetch_env!("IRACING_EMAIL"),
-        password: System.fetch_env!("IRACING_PASSWORD")
-      ]
-  end
-
-config :iracing, credentials
+if config_env() == :test do
+  config :iracing, email: "john@example.com", password: "secret"
+else
+  config :iracing,
+    email: System.fetch_env!("IRACING_EMAIL"),
+    password: System.fetch_env!("IRACING_PASSWORD")
+end
