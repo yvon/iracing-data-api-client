@@ -1,7 +1,7 @@
 defmodule RequestBuilderTest do
   use ExUnit.Case, async: true
 
-  @request &Iracing.Api.Fake.request/1
+  @request &Iracing.FakeClient.request/1
   @user "john@example.com"
   @password "secret"
 

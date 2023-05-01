@@ -1,4 +1,4 @@
-defmodule Iracing.Api.Http do
+defmodule Iracing.HttpClient do
   @middleware [
     {Tesla.Middleware.BaseUrl, "https://members-ng.iracing.com"},
     {Tesla.Middleware.JSON, engine_opts: [keys: :atoms]}

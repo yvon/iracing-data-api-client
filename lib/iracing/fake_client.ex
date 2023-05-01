@@ -1,4 +1,4 @@
-defmodule Iracing.Api.Fake do
+defmodule Iracing.FakeClient do
   @cookie "auth-token=42"
 
   @auth_body %{
