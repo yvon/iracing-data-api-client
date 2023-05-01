@@ -3,10 +3,7 @@ defmodule Iracing.Application do
   require Logger
 
   def start(_type, _args) do
-    children = [
-      {Registry, keys: :unique, name: :cached_data},
-      Iracing.AuthenticatedClient
-    ]
+    children = []
 
     Logger.info("Starting application...")
     Supervisor.start_link(children, strategy: :one_for_one)

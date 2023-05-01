@@ -16,13 +16,7 @@ defmodule Iracing.MixProject do
     [
       extra_applications: [:logger],
       mod: {Iracing.Application, []},
-      env: [
-        api:
-          case Mix.env() do
-            :test -> Iracing.Api.Fake
-            _ -> Iracing.Api.Http
-          end
-      ]
+      env: []
     ]
   end
 
