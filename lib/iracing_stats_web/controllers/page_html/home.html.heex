@@ -1,9 +1,11 @@
-<ul class="mt-4">
-  <%= for season <- @seasons do %>
-    <li>
-      <a href={~p"/seasons/#{season.season_id}"}>
-        <%= season.season_name %>
-      </a>
-    </li>
-  <% end %>
-</ul>
+<div class="bg-[url('/images/car.png')] bg-no-repeat bg-top pt-[320px]">
+  <ul class="mt-4">
+    <%= for season <- @seasons do %>
+      <li>
+        <a href={~p"/seasons/#{season.season_id}"}>
+          <%= season.season_name %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</div>
