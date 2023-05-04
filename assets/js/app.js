@@ -39,3 +39,19 @@ import "phoenix_html"
 // >> liveSocket.disableLatencySim()
 // window.liveSocket = liveSocket
 
+document.addEventListener("DOMContentLoaded", function () {
+    const images = document.querySelectorAll(".loading-image");
+
+    images.forEach(function (image) {
+        const loadingText = image.parentElement.querySelector(".loading-text");
+
+        image.addEventListener("load", function () {
+            loadingText.classList.add("hidden");
+            image.classList.remove("hidden");
+        });
+
+        image.addEventListener("error", function () {
+            loadingText.textContent = "Erreur lors du chargement de l'image";
+        });
+    });
+});
