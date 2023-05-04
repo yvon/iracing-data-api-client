@@ -51,14 +51,16 @@ defmodule IracingStatsWeb.PageController do
   end
 
   defp subsession_ids(season_id, race_week) do
-    for %{subsession_id: subsession_id} <-
+    for result <-
           Cache.data("/data/results/season_results",
             query: [
               season_id: season_id,
               race_week_num: race_week
             ]
           ).results_list,
-        do: subsession_id
+        result.event_type_name == "Race",
+        result.official_session == true,
+        do: result.subsession_id
   end
 
   defp result(subsession_id) do

@@ -2,6 +2,15 @@ defmodule IracingStatsWeb.PageSVG do
   @path System.find_executable("gnuplot")
   @options [:exit_status, :binary, args: ["-", "scripts/best_laps.gp"]]
 
+  def chart(%{points: []}) do
+    """
+    <?xml version="1.0" encoding="utf-8" standalone="no"?>
+    <svg height="100" width="200" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="24pt">No data yet</text>
+    </svg>
+    """
+  end
+
   def chart(%{points: points}) do
     Port.open({:spawn_executable, @path}, @options)
     |> send_gp_data(points)
