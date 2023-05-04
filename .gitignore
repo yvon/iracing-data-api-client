@@ -35,3 +35,5 @@ iracing_stats-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Credentials
+.env
