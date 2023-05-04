@@ -14,6 +14,7 @@ set ydata time
 set format y "%tM:%tS"
 set dgrid3d 20,40 gauss kdensity 400,0.5
 set palette defined (0 "white", 1 "#aa88dd")
+set output
 unset colorbox
 splot $Data using 1:($2/10000):(1) with pm3d notitle, \
 '' using 1:($2/10000):(1) with points lc "#6a558a" pt 5 ps 0.5 nogrid notitle
