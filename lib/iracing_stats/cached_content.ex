@@ -13,7 +13,12 @@ defmodule IracingStats.CachedContent do
 
   @impl true
   def init(function) do
-    {:ok, function.()}
+    value = function.()
+
+    case value do
+      nil -> {:stop, {:shutdown, :nil_value}, nil}
+      _ -> {:ok, value}
+    end
   end
 
   @impl true

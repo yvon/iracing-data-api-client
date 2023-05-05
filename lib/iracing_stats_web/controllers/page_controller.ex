@@ -2,23 +2,19 @@ defmodule IracingStatsWeb.PageController do
   use IracingStatsWeb, :controller
   alias IracingStats.Cache
 
+  @one_hour 3600
+  @one_day @one_hour * 24
+  @one_week @one_day * 7
+
   def home(conn, _params) do
-    seasons = IracingStats.Cache.data("/data/series/seasons")
-    render(conn, :home, seasons: seasons)
+    render(conn, :home, seasons: seasons())
   end
 
   def season(conn, %{"id" => id}) do
-    season =
-      Cache.data("/data/series/seasons")
-      |> Enum.find(&(&1.season_id == String.to_integer(id)))
-
-    week =
-      season.schedules
-      |> Enum.find(&(&1.race_week_num == season.race_week))
-
-    car_classes =
-      for car_class_id <- season.car_class_ids,
-          do: car_classe(car_class_id)
+    season_id = String.to_integer(id)
+    season = Enum.find(seasons(), fn e -> e.season_id == season_id end)
+    week = Enum.find(season.schedules, fn e -> e.race_week_num == season.race_week end)
+    car_classes = for id <- season.car_class_ids, do: car_classe(id)
 
     render(conn, :season, season: season, week: week, car_classes: car_classes)
   end
@@ -50,25 +46,29 @@ defmodule IracingStatsWeb.PageController do
     render(conn, :chart, points: points)
   end
 
+  defp seasons do
+    Cache.data("/data/series/seasons", ttl: @one_day)
+  end
+
   defp subsession_ids(season_id, race_week) do
-    for result <-
-          Cache.data("/data/results/season_results",
-            query: [
-              season_id: season_id,
-              race_week_num: race_week
-            ]
-          ).results_list,
+    for result <- results_list(season_id, race_week),
         result.event_type_name == "Race",
         result.official_session == true,
         do: result.subsession_id
   end
 
   defp result(subsession_id) do
-    Cache.data("/data/results/get", query: [subsession_id: subsession_id])
+    query = [subsession_id: subsession_id]
+    Cache.data("/data/results/get", query: query, ttl: @one_week)
+  end
+
+  defp results_list(season_id, race_week) do
+    query = [season_id: season_id, race_week_num: race_week]
+    Cache.data("/data/results/season_results", query: query, ttl: @one_day).results_list
   end
 
   defp car_classe(id) do
-    Cache.data("/data/carclass/get")
-    |> Enum.find(&(&1.car_class_id == id))
+    Cache.data("/data/carclass/get", ttl: @one_day)
+    |> Enum.find(fn e -> e.car_class_id == id end)
   end
 end

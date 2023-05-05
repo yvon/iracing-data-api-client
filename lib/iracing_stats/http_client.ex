@@ -11,7 +11,7 @@ defmodule IracingStats.HttpClient do
   @client Tesla.client(@middleware, @adapter)
 
   def request(options) do
-    Logger.info("Request: #{inspect(options)}")
+    Logger.info("Request: #{Keyword.take(options, [:method, :url, :query]) |> inspect}")
     Tesla.request!(@client, options)
   end
 end

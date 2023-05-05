@@ -20,18 +20,38 @@ defmodule IracingStats.Cache do
     query = Keyword.get(options, :query, [])
     ttl = Keyword.get(options, :ttl, @default_ttl)
 
-    fn -> RequestBuilder.get(cookies, url, query) end
-    |> fetch({url, query}, ttl)
+    fn options -> fetch(options, ttl) end
+    |> RequestBuilder.get(cookies, url, query)
   end
 
   defp authenticate do
-    fn -> RequestBuilder.authenticate() end
+    fn -> RequestBuilder.authenticate(&request/1) end
     |> fetch(:cookies, @auth_ttl)
   end
 
-  defp fetch(function, key, ttl) do
+  defp fetch(init, key, ttl) do
     name = {:via, Registry, {__MODULE__, key}}
-    GenServer.start_link(CachedContent, {function, ttl}, name: name)
+    GenServer.start_link(CachedContent, {init, ttl}, name: name)
     CachedContent.get(name)
   end
+
+  defp fetch(options, ttl) do
+    :get = Keyword.fetch!(options, :method)
+    url = Keyword.fetch!(options, :url)
+    query = Keyword.get(options, :query, [])
+
+    init = fn ->
+      response = request(options)
+
+      case response.status do
+        200 -> response
+        _ -> nil
+      end
+    end
+
+    fetch(init, {url, query}, ttl)
+  end
+
+  defp client, do: Application.fetch_env!(:iracing_stats, :client)
+  defp request(options), do: client().request(options)
 end
