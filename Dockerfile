@@ -21,6 +21,9 @@ RUN curl -L https://github.com/gnuplot/gnuplot/archive/refs/tags/5.4.4.tar.gz -o
     && cd .. \
     && rm -rf gnuplot-5.4.4.tar.gz gnuplot-5.4.4
 
+# Production environment
+ENV MIX_ENV=prod
+
 # Install Hex and Rebar
 RUN mix local.hex --force \
     && mix local.rebar --force
@@ -29,13 +32,16 @@ RUN mix local.hex --force \
 COPY mix.exs mix.lock ./
 
 # Install the application's dependencies
-RUN mix deps.get
+RUN mix deps.get --only prod
 
 # Copy the application's source code
 COPY . .
 
 # Compile the application
 RUN mix compile
+
+# Compile the assets
+RUN mix assets.deploy
 
 # Expose the port your application is running on
 EXPOSE 4000
