@@ -7,11 +7,9 @@ set border 10
 set xrange noextend
 set yrange noextend
 set xtics 500
-set ytics 1 scale 0.4,0.2
-set mytics 4
 set mxtics 2
 set ydata time
-set format y "%tM:%tS"
+set format y "%tM:%.3tS"
 set dgrid3d 20,40 gauss kdensity 400,0.5
 set palette defined (0 "white", 1 "#aa88dd")
 set output

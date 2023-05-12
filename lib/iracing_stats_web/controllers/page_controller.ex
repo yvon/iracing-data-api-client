@@ -41,6 +41,10 @@ defmodule IracingStatsWeb.PageController do
           result.class_interval > 0,
           # Only concerned class
           result.car_class_id == car_class_id,
+          # With lap times (I have -1 values)
+          result.best_lap_time > 0,
+          # With irating (I have -1 values, rookies?)
+          result.oldi_rating > 0,
           do: {result.oldi_rating, result.best_lap_time}
 
     render(conn, :chart, points: points)
