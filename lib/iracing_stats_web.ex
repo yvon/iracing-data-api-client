@@ -39,7 +39,7 @@ defmodule IracingStatsWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :svg],
+        formats: [:html, :json],
         layouts: [html: IracingStatsWeb.Layouts]
 
       import Plug.Conn

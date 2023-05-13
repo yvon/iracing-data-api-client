@@ -6,8 +6,8 @@ defmodule IracingStatsWeb.Router do
     plug :put_root_layout, {IracingStatsWeb.Layouts, :root}
   end
 
-  pipeline :svg do
-    plug :accepts, ["svg"]
+  pipeline :api do
+    plug :accepts, ["json"]
   end
 
   scope "/", IracingStatsWeb do
@@ -17,10 +17,10 @@ defmodule IracingStatsWeb.Router do
     get "/seasons/:id", PageController, :season
   end
 
-  scope "/charts", IracingStatsWeb do
-    pipe_through :svg
+  scope "/api", IracingStatsWeb do
+    pipe_through :api
 
-    get "/:season_id/:race_week/:car_class_id", PageController, :chart
+    get "/chart/:season_id/:race_week/:car_class_id", PageController, :chart
   end
 
   # Other scopes may use custom stacks.
