@@ -47,7 +47,7 @@ defmodule IracingStatsWeb.PageController do
           # Members who finished the race
           result.drop_race == false,
           # Under the winner lap
-          result.class_interval > 0,
+          result.class_interval >= 0,
           # Only concerned class
           result.car_class_id == car_class_id,
           # With lap times (I have -1 values)
