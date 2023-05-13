@@ -19,7 +19,13 @@ defmodule IracingStatsWeb.PageController do
     assets = Cache.data("/data/series/assets", ttl: @one_day)
     logo = assets[season.series_id |> Integer.to_string() |> String.to_existing_atom()][:logo]
 
-    render(conn, :season, season: season, week: week, car_classes: car_classes, logo: logo)
+    render(conn, :season,
+      season: season,
+      week: week,
+      car_classes: car_classes,
+      logo: logo,
+      page_title: season.season_name
+    )
   end
 
   def chart(conn, params) do
