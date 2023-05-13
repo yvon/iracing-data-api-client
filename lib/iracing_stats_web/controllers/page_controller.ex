@@ -7,7 +7,8 @@ defmodule IracingStatsWeb.PageController do
   @one_week @one_day * 7
 
   def home(conn, _params) do
-    render(conn, :home, seasons: seasons())
+    assets = Cache.data("/data/series/assets", ttl: @one_day)
+    render(conn, :home, seasons: seasons(), assets: assets)
   end
 
   def season(conn, %{"id" => id}) do
@@ -15,8 +16,10 @@ defmodule IracingStatsWeb.PageController do
     season = Enum.find(seasons(), fn e -> e.season_id == season_id end)
     week = Enum.find(season.schedules, fn e -> e.race_week_num == season.race_week end)
     car_classes = for id <- season.car_class_ids, do: car_classe(id)
+    assets = Cache.data("/data/series/assets", ttl: @one_day)
+    logo = assets[season.series_id |> Integer.to_string() |> String.to_existing_atom()][:logo]
 
-    render(conn, :season, season: season, week: week, car_classes: car_classes)
+    render(conn, :season, season: season, week: week, car_classes: car_classes, logo: logo)
   end
 
   def chart(conn, params) do

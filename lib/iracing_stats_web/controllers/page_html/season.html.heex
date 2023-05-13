@@ -1,19 +1,19 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-<h2 class="text-2xl"><%= @season.season_name %></h2>
-<h3 class="text-xl mb-4">
+<a href="/">
+  <img class="m-auto" src={"https://images-static.iracing.com/img/logos/series/#{@logo}"} />
+</a>
+
+<h2 class="text-2xl mt-4"><%= @season.season_name %></h2>
+<h3 class="text-xl mb-8">
   Week <%= @season.race_week %>:
   <%= @week.track.track_name %>
 </h3>
 
-<p>Each point is an iRacing member who finished on leader lap during this week.</p>
-<p>Graphs are updated every two hours.</p>
+<p class="mb-8">Each point is an iRacing member who finished on leader lap during this week. Graphs are updated every two hours.</p>
 
 <%= for car_class <- @car_classes do %>
-  <div class="border-t mt-6">
-    <h4 class="mt-4 font-bold"><%= car_class.name %></h4>
-    <div class="plot-container max-w-6xl m-auto" data-url={~p"/api/chart/#{@season.season_id}/#{@season.race_week}/#{car_class.car_class_id}"}>
-      <div class="loading-text">Loading...</div>
-    </div>
+  <div class="mb-12 plot-container max-w-6xl m-auto" data-url={~p"/api/chart/#{@season.season_id}/#{@season.race_week}/#{car_class.car_class_id}"} data-title={car_class.name}>
+    <div class="loading-text">Loading <%= car_class.name %> data...</div>
   </div>
 <% end %>

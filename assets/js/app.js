@@ -12,6 +12,7 @@ async function createPlot(container) {
       return;
     }
 
+    const title = `<b>${container.dataset.title}</b>`
     const containerWidth = container.clientWidth;
     const containerHeight = containerWidth * (9 / 16);
     const xValues = points.map(data => data.irating);
@@ -28,6 +29,7 @@ async function createPlot(container) {
     ];
 
     const layout = {
+      title: title,
       width: containerWidth,
       height: containerHeight,
       autosize: false,
