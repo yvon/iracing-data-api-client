@@ -9,7 +9,7 @@ defmodule IracingStats.Application do
   def start(_type, _args) do
     children = [
       # Cache Iracing API data
-      IracingStats.Cache,
+      IracingStats.CachedContent,
       # Start the Telemetry supervisor
       IracingStatsWeb.Telemetry,
       # Start the PubSub system

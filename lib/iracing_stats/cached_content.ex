@@ -1,8 +1,19 @@
 defmodule IracingStats.CachedContent do
   use GenServer
 
-  def get(pid) do
-    GenServer.call(pid, :get)
+  @registry __MODULE__.Registry
+
+  def child_spec(_options) do
+    Registry.child_spec(keys: :unique, name: @registry)
+  end
+
+  def fetch(fun, key, ttl) do
+    name = {:via, Registry, {@registry, key}}
+    # We try to start a new Genserver. It might be already started, which is fine.
+    # If not, it will be started and the init function will be called.
+    GenServer.start_link(__MODULE__, {fun, ttl}, name: name)
+    # Regardless we ask for the content.
+    GenServer.call(name, :get)
   end
 
   @impl true

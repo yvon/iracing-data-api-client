@@ -42,6 +42,6 @@ defmodule IracingStats.FakeClient do
   end
 
   defp respond_with(body) do
-    %{body: body}
+    %{body: body, status: 200}
   end
 end

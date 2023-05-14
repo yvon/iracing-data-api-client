@@ -1,13 +1,12 @@
 defmodule IracingStatsWeb.PageController do
   use IracingStatsWeb, :controller
-  alias IracingStats.Cache
+  alias IracingStats.CachedRequest
 
   @one_hour 3600
   @one_day @one_hour * 24
-  @one_week @one_day * 7
 
   def home(conn, _params) do
-    assets = Cache.data("/data/series/assets", ttl: @one_day)
+    assets = CachedRequest.data("/data/series/assets", ttl: @one_day)
     render(conn, :home, seasons: seasons(), assets: assets)
   end
 
@@ -16,7 +15,7 @@ defmodule IracingStatsWeb.PageController do
     season = Enum.find(seasons(), fn e -> e.season_id == season_id end)
     week = Enum.find(season.schedules, fn e -> e.race_week_num == season.race_week end)
     car_classes = for id <- season.car_class_ids, do: car_classe(id)
-    assets = Cache.data("/data/series/assets", ttl: @one_day)
+    assets = CachedRequest.data("/data/series/assets", ttl: @one_day)
     logo = assets[season.series_id |> Integer.to_string() |> String.to_existing_atom()][:logo]
 
     render(conn, :season,
@@ -36,7 +35,7 @@ defmodule IracingStatsWeb.PageController do
     # Concurrent requests
     stream =
       subsession_ids(season_id, race_week)
-      |> Task.async_stream(&result(&1))
+      |> Task.async_stream(&IracingStats.Result.fetch/1)
 
     points =
       for {:ok, data} <- stream,
@@ -60,7 +59,7 @@ defmodule IracingStatsWeb.PageController do
   end
 
   defp seasons do
-    Cache.data("/data/series/seasons", ttl: @one_day)
+    CachedRequest.data("/data/series/seasons", ttl: @one_day)
   end
 
   defp subsession_ids(season_id, race_week) do
@@ -70,18 +69,13 @@ defmodule IracingStatsWeb.PageController do
         do: result.subsession_id
   end
 
-  defp result(subsession_id) do
-    query = [subsession_id: subsession_id]
-    Cache.data("/data/results/get", query: query, ttl: @one_week)
-  end
-
   defp results_list(season_id, race_week) do
     query = [season_id: season_id, race_week_num: race_week]
-    Cache.data("/data/results/season_results", query: query, ttl: @one_day).results_list
+    CachedRequest.data("/data/results/season_results", query: query, ttl: @one_day).results_list
   end
 
   defp car_classe(id) do
-    Cache.data("/data/carclass/get", ttl: @one_day)
+    CachedRequest.data("/data/carclass/get", ttl: @one_day)
     |> Enum.find(fn e -> e.car_class_id == id end)
   end
 end

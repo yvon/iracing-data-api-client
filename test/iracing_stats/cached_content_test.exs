@@ -6,11 +6,11 @@ defmodule IracingStats.CachedContentTest do
     value = DateTime.utc_now()
     function = fn -> value end
     {:ok, pid} = GenServer.start_link(CachedContent, function)
-    assert CachedContent.get(pid) == value
+    assert GenServer.call(pid, :get) == value
   end
 
   test "expires and shuts down" do
-    function = fn -> nil end
+    function = fn -> true end
     {:ok, pid} = GenServer.start(CachedContent, {function, 0})
     Process.monitor(pid)
     assert_receive {:DOWN, _, _, pid, _}

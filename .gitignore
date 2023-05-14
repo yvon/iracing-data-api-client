@@ -37,3 +37,6 @@ npm-debug.log
 
 # Credentials
 .env
+
+# Cached results
+/results/*.json

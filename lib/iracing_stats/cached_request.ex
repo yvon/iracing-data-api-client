@@ -1,14 +1,10 @@
-defmodule IracingStats.Cache do
+defmodule IracingStats.CachedRequest do
   alias IracingStats.{RequestBuilder, CachedContent}
 
   # By default, authentication is cached for 20 minutes
   @auth_ttl 60 * 20
   # Other data for two hours
   @default_ttl 3600 * 2
-
-  def child_spec(_options) do
-    Registry.child_spec(keys: :unique, name: __MODULE__)
-  end
 
   def data(url), do: data(url, [])
 
@@ -26,30 +22,30 @@ defmodule IracingStats.Cache do
 
   defp authenticate do
     fn -> RequestBuilder.authenticate(&request/1) end
-    |> fetch(:cookies, @auth_ttl)
+    |> CachedContent.fetch(:cookies, @auth_ttl)
   end
 
-  defp fetch(init, key, ttl) do
-    name = {:via, Registry, {__MODULE__, key}}
-    GenServer.start_link(CachedContent, {init, ttl}, name: name)
-    CachedContent.get(name)
+  # Without TTL, immediately return the response
+  defp fetch(options, nil) do
+    response = request(options)
+
+    case response.status do
+      200 -> response
+      _ -> nil
+    end
   end
 
   defp fetch(options, ttl) do
+    # Ensure that we cache only GET requests
     :get = Keyword.fetch!(options, :method)
+
+    # Cache key
     url = Keyword.fetch!(options, :url)
     query = Keyword.get(options, :query, [])
+    key = {url, query}
 
-    init = fn ->
-      response = request(options)
-
-      case response.status do
-        200 -> response
-        _ -> nil
-      end
-    end
-
-    fetch(init, {url, query}, ttl)
+    init = fn -> fetch(options, nil) end
+    CachedContent.fetch(init, key, ttl)
   end
 
   defp client, do: Application.fetch_env!(:iracing_stats, :client)
