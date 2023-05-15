@@ -8,7 +8,7 @@ defmodule IracingStats.ResultTest do
     File.rm("results/#{@subsession_id}.json")
     pid = self()
 
-    query_function = fn "/data/results/get", query: [subsession_id: @subsession_id] ->
+    query_function = fn "/data/results/get", subsession_id: @subsession_id ->
       send(pid, :request)
       %{id: @subsession_id}
     end

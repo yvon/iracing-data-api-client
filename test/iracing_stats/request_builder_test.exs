@@ -11,14 +11,14 @@ defmodule RequestBuilderTest do
 
   test "follows links" do
     cookies = RequestBuilder.authenticate(@request)
-    data = RequestBuilder.get(@request, cookies, "/data/member/profile")
+    data = RequestBuilder.get(cookies, "/data/member/profile", [], @request)
     assert Map.has_key?(data, :profile)
   end
 
   test "can search series" do
     cookies = RequestBuilder.authenticate(@request)
     query = [start_range_begin: DateTime.to_iso8601(DateTime.utc_now())]
-    data = RequestBuilder.get(@request, cookies, "/data/results/search_series", query)
+    data = RequestBuilder.get(cookies, "/data/results/search_series", query, @request)
     assert Map.has_key?(hd(data), :subsession_id)
   end
 end

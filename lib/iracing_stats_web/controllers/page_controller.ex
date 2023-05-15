@@ -1,12 +1,9 @@
 defmodule IracingStatsWeb.PageController do
   use IracingStatsWeb, :controller
-  alias IracingStats.CachedRequest
-
-  @one_hour 3600
-  @one_day @one_hour * 24
+  alias IracingStats.CachedAuth
 
   def home(conn, _params) do
-    assets = CachedRequest.data("/data/series/assets", ttl: @one_day)
+    assets = CachedAuth.get("/data/series/assets")
     render(conn, :home, seasons: seasons(), assets: assets)
   end
 
@@ -15,7 +12,7 @@ defmodule IracingStatsWeb.PageController do
     season = Enum.find(seasons(), fn e -> e.season_id == season_id end)
     week = Enum.find(season.schedules, fn e -> e.race_week_num == season.race_week end)
     car_classes = for id <- season.car_class_ids, do: car_classe(id)
-    assets = CachedRequest.data("/data/series/assets", ttl: @one_day)
+    assets = CachedAuth.get("/data/series/assets")
     logo = assets[season.series_id |> Integer.to_string() |> String.to_existing_atom()][:logo]
 
     render(conn, :season,
@@ -59,7 +56,7 @@ defmodule IracingStatsWeb.PageController do
   end
 
   defp seasons do
-    CachedRequest.data("/data/series/seasons", ttl: @one_day)
+    CachedAuth.get("/data/series/seasons")
   end
 
   defp subsession_ids(season_id, race_week) do
@@ -71,11 +68,11 @@ defmodule IracingStatsWeb.PageController do
 
   defp results_list(season_id, race_week) do
     query = [season_id: season_id, race_week_num: race_week]
-    CachedRequest.data("/data/results/season_results", query: query, ttl: @one_day).results_list
+    CachedAuth.get("/data/results/season_results", query).results_list
   end
 
   defp car_classe(id) do
-    CachedRequest.data("/data/carclass/get", ttl: @one_day)
-    |> Enum.find(fn e -> e.car_class_id == id end)
+    CachedAuth.get("/data/carclass/get")
+    |> Enum.find(&(&1.car_class_id == id))
   end
 end
