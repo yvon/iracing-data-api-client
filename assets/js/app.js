@@ -27,6 +27,7 @@ async function createPlot(container) {
 
     const layout = {
       title: title,
+      hovermode: 'closest',
       xaxis: {
         title: "iRating",
       },
