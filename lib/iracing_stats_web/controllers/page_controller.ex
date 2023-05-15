@@ -1,25 +1,20 @@
 defmodule IracingStatsWeb.PageController do
   use IracingStatsWeb, :controller
-  alias IracingStats.CachedAuth
+  alias IracingStats.{CachedAuth, CachedContent}
 
   def home(conn, _params) do
-    assets = CachedAuth.get("/data/series/assets")
-    render(conn, :home, seasons: seasons(), assets: assets)
+    render(conn, :home, seasons: seasons(), assets: assets())
   end
 
   def season(conn, %{"id" => id}) do
     season_id = String.to_integer(id)
-    season = Enum.find(seasons(), fn e -> e.season_id == season_id end)
-    week = Enum.find(season.schedules, fn e -> e.race_week_num == season.race_week end)
-    car_classes = for id <- season.car_class_ids, do: car_classe(id)
-    assets = CachedAuth.get("/data/series/assets")
-    logo = assets[season.series_id |> Integer.to_string() |> String.to_existing_atom()][:logo]
+    season = season(season_id)
 
     render(conn, :season,
       season: season,
-      week: week,
-      car_classes: car_classes,
-      logo: logo,
+      week: week(season),
+      car_classes: car_classes(season),
+      logo: logo(season),
       page_title: season.season_name
     )
   end
@@ -56,7 +51,31 @@ defmodule IracingStatsWeb.PageController do
   end
 
   defp seasons do
-    CachedAuth.get("/data/series/seasons")
+    init = fn -> CachedAuth.get("/data/series/seasons") end
+    # Cache for 1 hour
+    CachedContent.fetch(init, :seasons, 3600)
+  end
+
+  def season(id) do
+    Enum.find(seasons(), fn e -> e.season_id == id end)
+  end
+
+  def assets do
+    init = fn -> CachedAuth.get("/data/series/assets") end
+    # Cache for a day
+    CachedContent.fetch(init, :assets, 3600 * 24)
+  end
+
+  def logo(season) do
+    assets()[season.series_id |> Integer.to_string() |> String.to_existing_atom()][:logo]
+  end
+
+  def week(season) do
+    Enum.find(season.schedules, fn e -> e.race_week_num == season.race_week end)
+  end
+
+  def car_classes(season) do
+    for id <- season.car_class_ids, do: car_classe(id)
   end
 
   defp subsession_ids(season_id, race_week) do
@@ -72,7 +91,7 @@ defmodule IracingStatsWeb.PageController do
   end
 
   defp car_classe(id) do
-    CachedAuth.get("/data/carclass/get")
+    CachedContent.fetch(fn -> CachedAuth.get("/data/carclass/get") end, :car_classes, 3600)
     |> Enum.find(&(&1.car_class_id == id))
   end
 end
