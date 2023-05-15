@@ -6,7 +6,8 @@ defmodule IracingStatsWeb.PageJSON do
             irating: result.oldi_rating,
             lap_time: result.best_lap_time,
             start_time: session.start_time,
-            display_name: result.display_name
+            display_name: result.display_name,
+            car_name: result.car_name
           }
 
     %{points: points}

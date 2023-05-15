@@ -16,7 +16,7 @@ async function createPlot(container) {
     const xValues = points.map(data => data.irating);
     const yValues = points.map(data => new Date(data.lap_time / 10));
     const timestamps = points.map(data => new Date(data.start_time).getTime());
-    const hoverTexts = points.map(data => `${data.display_name}<br>${new Date(data.start_time).toString()}`);
+    const hoverTexts = points.map(data => `${data.display_name}<br>${data.car_name}<br>${new Date(data.start_time).toString()}`);
 
     // Find the minimum and maximum timestamps.
     const minTimestamp = Math.min(...timestamps);
