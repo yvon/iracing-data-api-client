@@ -13,8 +13,6 @@ async function createPlot(container) {
     }
 
     const title = `<b>${container.dataset.title}</b>`
-    const containerWidth = container.clientWidth;
-    const containerHeight = containerWidth * (9 / 16);
     const xValues = points.map(data => data.irating);
     const yValues = points.map(data => new Date(data.lap_time / 10));
 
@@ -22,7 +20,6 @@ async function createPlot(container) {
       {
         x: xValues,
         y: yValues,
-
         mode: 'markers',
         type: 'scatter',
       },
@@ -30,9 +27,6 @@ async function createPlot(container) {
 
     const layout = {
       title: title,
-      width: containerWidth,
-      height: containerHeight,
-      autosize: false,
       xaxis: {
         title: "iRating",
       },
@@ -45,7 +39,7 @@ async function createPlot(container) {
       }
     };
 
-    Plotly.newPlot(container, data, layout);
+    Plotly.newPlot(container, data, layout, {responsive: true});
     loadingText.classList.add("hidden");
 
   } catch (e) {
