@@ -45,7 +45,7 @@ defmodule IracingStatsWeb.PageController do
           result.best_lap_time > 0,
           # With irating (I have -1 values, rookies?)
           result.oldi_rating > 0,
-          do: {result.oldi_rating, result.best_lap_time}
+          do: %{session: data, result: result}
 
     render(conn, :chart, points: points)
   end

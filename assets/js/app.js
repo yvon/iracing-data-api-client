@@ -15,6 +15,12 @@ async function createPlot(container) {
     const title = `<b>${container.dataset.title}</b>`
     const xValues = points.map(data => data.irating);
     const yValues = points.map(data => new Date(data.lap_time / 10));
+    const timestamps = points.map(data => new Date(data.start_time).getTime());
+    const hoverTexts = points.map(data => `${data.display_name}<br>${new Date(data.start_time).toString()}`);
+
+    // Find the minimum and maximum timestamps.
+    const minTimestamp = Math.min(...timestamps);
+    const maxTimestamp = Math.max(...timestamps);
 
     const data = [
       {
@@ -22,6 +28,12 @@ async function createPlot(container) {
         y: yValues,
         mode: 'markers',
         type: 'scatter',
+        marker: {
+          color: timestamps,
+          cmin: minTimestamp,
+          cmax: maxTimestamp,
+        },
+        hovertext: hoverTexts,
       },
     ];
 
@@ -37,7 +49,7 @@ async function createPlot(container) {
           standoff: 20,
         },
         tickformat: '%M:%S.%2f'
-      }
+      },
     };
 
     Plotly.newPlot(container, data, layout, {responsive: true});

@@ -1,8 +1,13 @@
 defmodule IracingStatsWeb.PageJSON do
   def chart(%{points: points}) do
     points =
-      for {irating, lap_time} <- points,
-          do: %{irating: irating, lap_time: lap_time}
+      for %{session: session, result: result} <- points,
+          do: %{
+            irating: result.oldi_rating,
+            lap_time: result.best_lap_time,
+            start_time: session.start_time,
+            display_name: result.display_name
+          }
 
     %{points: points}
   end
