@@ -16,5 +16,9 @@ services:
       dockerfile: Dockerfile.nginx
     ports:
       - "4001:80"
+    volumes:
+      - nginx_cache:/var/cache/nginx
     depends_on:
       - app
+volumes:
+  nginx_cache:
