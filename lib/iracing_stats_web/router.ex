@@ -20,7 +20,13 @@ defmodule IracingStatsWeb.Router do
   scope "/api", IracingStatsWeb do
     pipe_through :api
 
-    get "/chart/:season_id/:race_week/:car_class_id", PageController, :chart
+    get "/chart/:season_id/:race_week/:car_class_id",
+        PageController,
+        :races_chart
+
+    get "/chart/:season_id/:race_week/:car_class_id/qualifications",
+        PageController,
+        :qualifications_chart
   end
 
   # Other scopes may use custom stacks.

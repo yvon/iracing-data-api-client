@@ -19,7 +19,15 @@ defmodule IracingStatsWeb.PageController do
     )
   end
 
-  def chart(conn, params) do
+  def races_chart(conn, params) do
+    chart(conn, params, "Race")
+  end
+
+  def qualifications_chart(conn, params) do
+    chart(conn, params, "Lone Qualifying")
+  end
+
+  defp chart(conn, params, session_type) do
     season_id = String.to_integer(params["season_id"])
     race_week = String.to_integer(params["race_week"])
     car_class_id = String.to_integer(params["car_class_id"])
@@ -32,8 +40,7 @@ defmodule IracingStatsWeb.PageController do
     points =
       for {:ok, data} <- stream,
           session <- data.session_results,
-          # Exclude pratices and qualifications
-          session.simsession_type_name == "Race",
+          session.simsession_type_name == session_type,
           result <- session.results,
           # Members who finished the race
           result.drop_race == false,
