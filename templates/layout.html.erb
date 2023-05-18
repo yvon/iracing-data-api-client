@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" style="scrollbar-gutter: stable;">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <title>iRacing Stats<title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script defer type="text/javascript" src="/app.js"></script>
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  </head>
+  <body class="bg-white antialiased">
+    <main class="px-4 py-10 sm:px-6 lg:px-8 text-center">
+      <%= content %>
+    </main>
+  </body>
+</html>

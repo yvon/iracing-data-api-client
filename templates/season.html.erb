@@ -1,0 +1,25 @@
+<a href="/">
+  <img class="m-auto" src="https://images-static.iracing.com/img/logos/series/<%= assigns[:logo] %>" />
+</a>
+
+<h2 class="text-2xl mt-4"><%= assigns[:season]['season_name'] %></h2>
+<h3 class="text-xl mb-8">
+  Week <%= assigns[:season]['race_week'] + 1 %>:
+  <%= assigns[:week]['track']['track_name'] %>
+</h3>
+
+<p class="mb-8">Each point is an iRacing member who finished on leader lap
+during this week. Graphs are updated every two hours.</p>
+
+<% assigns[:car_classes].each do |car_class| %>
+  <% season = assigns[:season] %>
+  <% chart_url = "/api/chart/#{season['season_id']}/#{season['race_week']}/#{car_class['car_class_id']}" %>
+  <div
+      class="mb-12 plot-container max-w-6xl min-h-[40rem] m-auto"
+      data-url="<%= chart_url %>"
+      data-qualifications-url="<%= chart_url %>/qualifications"
+      data-title="<%= car_class['name'] %>"
+      >
+    <div class="loading-text">Loading <%= car_class['name'] %> data...</div>
+  </div>
+<% end %>
