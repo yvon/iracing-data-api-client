@@ -3,6 +3,5 @@ Visit https://iracing-stats.com/
 Or host it yourself:
 
 ```
-npx tailwindcss -o assets/app.css --minify
 IRACING_EMAIL=you@example.com IRACING_PASSWORD=secret rake
 ```
