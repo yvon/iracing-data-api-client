@@ -13,11 +13,11 @@ during this week. Graphs are updated every two hours.</p>
 
 <% assigns[:car_classes].each do |car_class| %>
   <% season = assigns[:season] %>
-  <% chart_url = "/api/chart/#{season['season_id']}/#{season['race_week']}/#{car_class['car_class_id']}" %>
+  <% chart_url = "/#{season['season_id']}/#{car_class['car_class_id']}" %>
   <div
       class="mb-12 plot-container max-w-6xl min-h-[40rem] m-auto"
-      data-url="<%= chart_url %>"
-      data-qualifications-url="<%= chart_url %>/qualifications"
+      data-url="<%= chart_url %>/race.csv"
+      data-qualifications-url="<%= chart_url %>/qualifying.csv"
       data-title="<%= car_class['name'] %>"
       >
     <div class="loading-text">Loading <%= car_class['name'] %> data...</div>

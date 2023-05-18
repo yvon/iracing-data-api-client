@@ -17,7 +17,6 @@ class Authenticator
       raise "Authentication failed. Status code: #{response.code}"
     end
 
-    puts 'Successfully connected!'
     @session.update_cookies(response)
   end
 
