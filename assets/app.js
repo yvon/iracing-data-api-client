@@ -80,7 +80,7 @@ async function createPlot(container) {
           text:'Best lap time',
           standoff: 20,
         },
-        tickformat: '%M:%S.%2f'
+        tickformat: '%M:%S.%3f'
       },
     };
 
