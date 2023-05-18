@@ -4,9 +4,8 @@ Dir["./src/*.rb"].each { |file| require file }
 Thread.abort_on_exception = true
 
 task :authenticate do
-  puts "auth"
   $client = Client.new
-  $client.authenticate(ENV['IRACING_EMAIL'], ENV['IRACING_PASSWORD'])
+  $client.authenticate(ENV.fetch('IRACING_EMAIL'), ENV.fetch('IRACING_PASSWORD'))
 end
 
 task :seasons => :authenticate do

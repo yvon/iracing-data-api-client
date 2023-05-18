@@ -1,0 +1,8 @@
+Visit https://iracing-stats.com/
+
+Or host it yourself:
+
+```
+npx tailwindcss -o assets/app.css --minify
+rake
+```
