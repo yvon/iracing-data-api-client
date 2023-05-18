@@ -85,3 +85,8 @@ desc 'Copy the assets'
 task :copy_assets, [:destination] => :destination do |t, args|
   FileUtils.cp_r('./assets/.', $destination)
 end
+
+desc 'Generate all content'
+task :generate, [:destination] => [:generate_pages, :generate_charts, :copy_assets]
+
+task :default => :generate
