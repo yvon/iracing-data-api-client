@@ -1,5 +1,9 @@
-<h1 class="text-3xl mb-8 uppercase font-bold">iRacing Stats</h1>
-<ul class="mt-4 flex flex-wrap justify-center gap-4">
+<div class="pb-4">
+  <a href="/"><h1 class="text-3xl font-bold">iRacing Stats</h1></a>
+  <p class="mt-2">We translate racing data into visual insights.</p>
+</div>
+
+<ul class="pt-4 pb-12 flex flex-wrap justify-center gap-4 bg-white m-auto">
   <% assigns[:seasons].each do |season| %>
     <li class="w-64">
       <a href="<%= season['season_id'] %>">
@@ -12,7 +16,7 @@
     </li>
   <% end %>
 </ul>
-<ul class="flex flex-col gap-1 pt-16">
+<ul class="flex flex-col gap-1 py-10">
   <% assigns[:seasons].each do |season| %>
     <li>
       <a href="<%= season['season_id'] %>">
