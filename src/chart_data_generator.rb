@@ -4,12 +4,7 @@ class ChartDataGenerator
     'Race' => 'race'
   }.freeze
 
-  def initialize(content_generator)
-    @content_generator = content_generator
-    @mutex = Mutex.new
-  end
-
-  def generate(season, event, data)
+  def generate(season, event, data, &block)
     data['session_results'].each do |session|
 
       # Only races and qualifications
@@ -25,7 +20,16 @@ class ChartDataGenerator
           session_type
         ]
 
-        append(path, data, result)
+        content = [
+          result['oldi_rating'],
+          result['best_lap_time'],
+          data['start_time'],
+          result['display_name'],
+          result['car_name']
+        ]
+
+        filename = "#{File.join(path.map(&:to_s))}.csv"
+        block.call(filename, "#{content.join(',')}\n")
       end
     end
   end
@@ -46,22 +50,5 @@ class ChartDataGenerator
     return false if result['oldi_rating'] <= 0
 
     true
-  end
-
-  def append(path, data, result)
-    filename = "#{File.join(path.map(&:to_s))}.csv"
-
-    content = [
-      result['oldi_rating'],
-      result['best_lap_time'],
-      data['start_time'],
-      result['display_name'],
-      result['car_name']
-    ]
-
-    @mutex.synchronize do
-      # TODO: safe csv generation
-      @content_generator.generate(filename, content.join(',') + "\n", mode: 'a')
-    end
   end
 end

@@ -1,5 +1,3 @@
-require 'json'
-
 require_relative 'client/session'
 require_relative 'client/rate_limiter'
 require_relative 'client/requester'
@@ -20,14 +18,12 @@ class Client
     @authenticator.authenticate(email, password)
   end
 
-  def data(path)
+  def get(path)
     response = @rate_limiter.perform do
       puts "[%d] %s" % [@rate_limiter.remaining, path]
       @requester.get(path)
     end
 
-    response = @response_handler.handle_response(response)
-
-    JSON.parse(response.body)
+    @response_handler.handle_response(response)
   end
 end
