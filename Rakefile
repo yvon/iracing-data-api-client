@@ -41,4 +41,6 @@ task :copy_assets, [:destination] => :destination do |t, args|
 end
 
 desc 'Fetch data, generate static content and copy assets'
-task :default => [:fetch_data, :generate_static_content, :copy_assets]
+task :generate, [:destination] => [:fetch_data, :generate_static_content, :copy_assets]
+
+task :default, [:destination] => [:generate]
