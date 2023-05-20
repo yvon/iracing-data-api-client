@@ -14,7 +14,7 @@
 
   <% assigns[:car_classes].each do |car_class| %>
     <% season = assigns[:season] %>
-    <% chart_url = "/#{season['season_id']}/#{car_class['car_class_id']}" %>
+    <% chart_url = "charts/#{car_class['car_class_id']}" %>
     <div
         class="mb-12 plot-container max-w-6xl min-h-[40rem] m-auto"
         data-url="<%= chart_url %>/race.csv"

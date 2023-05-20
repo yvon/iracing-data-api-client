@@ -6,7 +6,7 @@
 <ul class="pt-4 pb-12 flex flex-wrap justify-center gap-4 bg-white m-auto">
   <% assigns[:seasons].each do |season| %>
     <li class="w-64">
-      <a href="<%= season['season_id'] %>">
+      <a href="/seasons/<%= season['season_id'] %>">
         <%-
           id = season['series_id'].to_s
           logo = assigns[:assets][id]['logo']
@@ -19,7 +19,7 @@
 <ul class="flex flex-col gap-1 py-10">
   <% assigns[:seasons].each do |season| %>
     <li>
-      <a href="<%= season['season_id'] %>">
+      <a href="/seasons/<%= season['season_id'] %>">
         <%= season['season_name'] %>
       </a>
     </li>

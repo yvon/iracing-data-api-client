@@ -12,10 +12,16 @@ class Client
     @requester = Requester.new(session)
     @authenticator = Authenticator.new(session, @requester)
     @response_handler = ResponseHandler.new(session, @requester)
+    @authenticated = false
   end
 
   def authenticate(email, password)
     @authenticator.authenticate(email, password)
+    @authenticated = true
+  end
+
+  def authenticated?
+    @authenticated == true
   end
 
   def get(path)
