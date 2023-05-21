@@ -16,6 +16,12 @@ module IracingStats
 
           car_class_id = result['car_class_id']
 
+          keys = {
+            season_id: data['season_id'],
+            car_class_id: car_class_id,
+            session_type: session_type
+          }
+
           content = [
             result['oldi_rating'],
             result['best_lap_time'],
@@ -24,7 +30,7 @@ module IracingStats
             result['car_name']
           ]
 
-          block.call(car_class_id, session_type, content)
+          block.call(keys, content)
         end
       end
     end

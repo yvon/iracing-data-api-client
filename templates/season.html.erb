@@ -2,10 +2,10 @@
   <img class="m-auto" src="https://images-static.iracing.com/img/logos/series/<%= assigns[:logo] %>" />
 </a>
 
-<h2 class="text-2xl mt-3"><%= assigns[:season]['season_name'] %></h2>
+<h2 class="text-2xl mt-3"><%= assigns[:season][:season_name] %></h2>
 <h3 class="text-xl mb-5">
-  Week <%= assigns[:season]['race_week'] + 1 %>:
-  <%= assigns[:week]['track']['track_name'] %>
+  Week <%= assigns[:season][:race_week] + 1 %>:
+  <%= assigns[:week][:track][:track_name] %>
 </h3>
  
 <div class="bg-white pt-5 pb-4">
@@ -14,14 +14,14 @@
 
   <% assigns[:car_classes].each do |car_class| %>
     <% season = assigns[:season] %>
-    <% chart_url = "charts/#{car_class['car_class_id']}" %>
+    <% chart_url = "charts/#{car_class[:car_class_id]}" %>
     <div
         class="mb-12 plot-container max-w-6xl min-h-[40rem] m-auto"
         data-url="<%= chart_url %>/race.csv"
         data-qualifications-url="<%= chart_url %>/qualifying.csv"
-        data-title="<%= car_class['name'] %>"
+        data-title="<%= car_class[:name] %>"
         >
-      <div class="loading-text">Loading <%= car_class['name'] %> data...</div>
+      <div class="loading-text">Loading <%= car_class[:name] %> data...</div>
     </div>
   <% end %>
 </div>

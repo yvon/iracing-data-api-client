@@ -8,8 +8,6 @@ require_relative 'data_writer'
 
 module IracingStats
   class App
-    SEASON_RESULTS_PATH = 'data/results/season_results?season_id=%d&race_week_num=%d'
-
     def initialize
       @client = Client.new
       @chart_data_generator ||= ChartDataGenerator.new
@@ -20,35 +18,19 @@ module IracingStats
       @client.authenticate(ENV.fetch('IRACING_EMAIL'), ENV.fetch('IRACING_PASSWORD'))
     end
 
-    def seasons
-      @seasons ||= @data_reader.data('data/series/seasons')
-    end
-
-    def assets
-      @assets ||= @data_reader.data('data/series/assets')
-    end
-
-    def car_classes
-      @car_classes ||= @data_reader.data('data/carclass/get')
-    end
-
-    def season_results(season_id, race_week)
-      @data_reader.data(SEASON_RESULTS_PATH % [season_id, race_week])
-    end
-
-    def generate_index_page(filename)
+    def generate_index_page(filename, seasons, assets)
       content = @page_generator.index_page(seasons, assets)
       File.write(filename, content)
     end
 
-    def generate_season_page(filename, season)
+    def generate_season_page(filename, season, assets, car_classes)
       content = @page_generator.season_page(season, assets, car_classes)
 
       FileUtils.mkdir_p(File.dirname(filename))
       File.write(filename, content)
     end
 
-    def generate_chart_content(folder, result_files)
+    def generate_chart_content(file_format, result_files)
       files = Hash.new do |h, k|
         FileUtils.mkdir_p(File.dirname(k))
         h[k] = CSV.open(k, 'w')
@@ -57,9 +39,8 @@ module IracingStats
       result_files.each do |result_file|
         result = @data_reader.data(result_file)
 
-        @chart_data_generator.generate(result) do |car_class_id, session_type, data|
-          filename = "#{folder}/#{car_class_id}/#{session_type}.csv"
-          files[filename] << data
+        @chart_data_generator.generate(result) do |keys, data|
+          files[file_format % keys] << data
         end
       end
 

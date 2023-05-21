@@ -18,14 +18,14 @@ module IracingStats
     end
 
     def season_page(season, assets, car_classes)
-      season_id = season['season_id']
+      season_id = season[:season_id]
 
       assigns = {
         season: season,
-        week: season['schedules'].find { |e| e['race_week_num'] == season['race_week'] },
-        car_classes: season['car_class_ids'].map { |id| car_classes.find { |e| e['car_class_id'] == id } },
-        logo: assets[season['series_id'].to_s]['logo'],
-        page_title: season['season_name']
+        week: season[:schedules].find { |e| e[:race_week_num] == season[:race_week] },
+        car_classes: season[:car_class_ids].map { |id| car_classes.find { |e| e[:car_class_id] == id } },
+        logo: assets[season[:series_id].to_s.to_sym][:logo],
+        page_title: season[:season_name]
       }
 
       content('season.html.erb', assigns)
