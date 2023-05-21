@@ -11,7 +11,7 @@ SEASON_RESULTS = 'data/results/season_results?season_id=%<season_id>d&race_week_
 CHARTS_FOLDER_FORMAT = 'out/seasons/%<season_id>d/charts'
 CSV_FILE_FORMAT = 'out/seasons/%<season_id>s/charts/%<car_class_id>d/%<session_type>s.csv'
 
-PAGES_PREREQUISITES = FileList['templates/*'] + ['out', SEASONS, ASSETS, CAR_CLASSES]
+PAGES_PREREQUISITES = FileList['templates/*', 'lib/**', 'out', SEASONS, ASSETS, CAR_CLASSES]
 
 def parse_data(file)
   Rake::Task[file].invoke

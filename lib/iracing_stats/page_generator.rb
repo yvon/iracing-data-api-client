@@ -9,8 +9,14 @@ module IracingStats
     end
 
     def index_page(seasons, assets)
+      started_seasons = seasons.filter do |season|
+        week = season[:race_week]
+        schedule = season[:schedules][week]
+        Date.today >= Date.parse(schedule[:start_date])
+      end
+
       assigns = {
-        seasons: seasons,
+        seasons: started_seasons,
         assets: assets,
       }
 
