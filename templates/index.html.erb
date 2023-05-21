@@ -1,9 +1,9 @@
-<div class="pb-4">
+<div class="mt-6 mb-7 px-3">
   <a href="/"><h1 class="text-3xl font-bold">iRacing Stats</h1></a>
-  <p class="mt-2">We translate racing data into visual insights.</p>
+  <div>We translate racing data into visual insights.</div>
 </div>
 
-<ul class="pt-4 pb-12 flex flex-wrap justify-center gap-4 bg-white m-auto">
+<ul class="pt-7 pb-12 flex flex-wrap justify-center gap-4 bg-white m-auto px-3">
   <% assigns[:seasons].each do |season| %>
     <li class="w-64">
       <a href="/seasons/<%= season[:season_id] %>">

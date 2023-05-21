@@ -45,6 +45,13 @@ file 'out/seasons' => PAGES_PREREQUISITES do |t|
   touch t.name
 end
 
+desc 'Remove cached files that are regularly updated'
+task :remove_dynamic_data do
+  files = Rake::FileList['data/series/seasons', 'data/results/season_results*'].existing
+  FileUtils.rm files, force: true
+  puts "#{files.size} files deleted"
+end
+
 multitask :async_charts
 
 task :prepare_charts do
@@ -85,5 +92,15 @@ task assets: :out do
 end
 
 desc 'Generate the whole website'
-task all: [:pages, :charts, :assets]
-task default: :all
+task build: [:pages, :charts, :assets]
+task default: :build
+
+desc 'Fetch latest data and re-build the website'
+task update: [:remove_dynamic_data, :build]
+
+task :compile_css do
+  sh 'npx tailwindcss -o assets/app.css --minify'
+end
+
+desc 'Build and compile the CSS'
+task dev: [:compile_css, :build]
