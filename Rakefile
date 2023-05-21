@@ -104,3 +104,8 @@ end
 
 desc 'Build and compile the CSS'
 task dev: [:compile_css, :build]
+
+desc 'Delete data files older than 7 days'
+task :clean do
+  sh 'find data -type f -mtime +7 -delete'
+end
