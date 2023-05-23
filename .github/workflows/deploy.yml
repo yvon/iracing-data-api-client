@@ -32,12 +32,21 @@ jobs:
           restore-keys: |
             data-
 
+      - name: Configure cache for data directory
+        id: cache-data-dir
+        uses: actions/cache@v3
+        with:
+          path: data/
+          key: data-dir-${{ github.run_id }}
+          restore-keys: |
+            data-dir-
+
       - name: Extract data
         run: |
           test -f data.tgz && tar -xzf data.tgz || echo "Missing data"
 
       - name: Build the site
-        run: rake update clean
+        run: rake -j 4 update clean
 
       - name: Compress data
         run: tar -czf data.tgz data
