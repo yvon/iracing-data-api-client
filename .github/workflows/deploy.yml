@@ -3,6 +3,9 @@ name: Deploy to Pages
 on:
   push:
     branches: [ "staging" ]
+  # Every hour
+  schedule:
+    - cron: "0 * * * *"
 
 jobs:
   build:
