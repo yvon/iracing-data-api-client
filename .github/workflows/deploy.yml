@@ -10,7 +10,7 @@ jobs:
     env:
       IRACING_EMAIL: ${{ secrets.IRACING_EMAIL }}
       IRACING_PASSWORD: ${{ secrets.IRACING_PASSWORD }}
-      BASE_URL: "https://yvon.github.io/iracing-data-api-client"
+      BASE_URL: "https://yvon.github.io/iracing-data-api-client/"
 
     steps:
       - uses: actions/checkout@v3
