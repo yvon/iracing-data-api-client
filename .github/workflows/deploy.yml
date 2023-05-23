@@ -7,6 +7,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      IRACING_EMAIL: ${{ secrets.IRACING_EMAIL }}
+      IRACING_PASSWORD: ${{ secrets.IRACING_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v3
