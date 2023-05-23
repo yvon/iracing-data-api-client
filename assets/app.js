@@ -1,29 +1,96 @@
-async function plotlyData(url) {
+function createHoverText(data) {
+  const { displayName, carName, startTime } = data;
+  return `${displayName}<br>${carName}<br>${new Date(startTime).toString()}`;
+}
+
+function createPlotlyLayout(title) {
+  return {
+    title: `<b>${title}</b>`,
+    showlegend: false,
+    hovermode: 'closest',
+
+    xaxis: {
+      title: "iRating",
+    },
+
+    yaxis: {
+      title: {
+        text:'Best lap time',
+        standoff: 20,
+      },
+      tickformat: '%M:%S.%3f'
+    },
+
+    updatemenus: [
+      {
+        buttons: [
+          {
+            args: [{'visible': [true, false]}],
+            label: 'Races',
+            method: 'update'
+          },
+          {
+            args: [{'visible': [false, true]}],
+            label: 'Qualifications',
+            method: 'update'
+          },
+        ],
+        showactive: true,
+        type: 'buttons',
+        direction: 'right',
+        x: 0.5,
+      }
+    ],
+  };
+}
+
+function parseCSVData(csvData) {
+  return d3.csvParseRows(csvData, d => ({
+    irating: +d[0],
+    lapTime: new Date(+d[1] / 10),
+    startTime: new Date(d[2]).getTime(),
+    displayName: d[3],
+    carName: d[4],
+  }));
+}
+
+async function getDataPoints(url) {
   const response = await fetch(url);
   const csvData = await response.text();
+  return parseCSVData(csvData);
+}
 
-  const points = d3.csvParseRows(csvData, d => ({
-    irating: +d[0],
-    lap_time: +d[1],
-    start_time: d[2],
-    display_name: d[3],
-    car_name: d[4]
-  }));
+async function buildTrace(url, name, visible = true) {
+  const points = await getDataPoints(url);
 
-  const xValues = points.map(data => data.irating);
-  const yValues = points.map(data => new Date(data.lap_time / 10));
-  const timestamps = points.map(data => new Date(data.start_time).getTime());
-  const hoverTexts = points.map(data => `${data.display_name}<br>${data.car_name}<br>${new Date(data.start_time).toString()}`);
+  const xValues = [], yValues = [], timestamps = [], hoverTexts = [];
+  let minTimestamp = Infinity, maxTimestamp = -Infinity;
 
-  // Find the minimum and maximum timestamps.
-  const minTimestamp = Math.min(...timestamps);
-  const maxTimestamp = Math.max(...timestamps);
+  for (const point of points) {
+    const hoverText = createHoverText(point);
+    const { irating, lapTime, startTime } = point;
+
+    xValues.push(irating);
+    yValues.push(lapTime);
+    timestamps.push(startTime);
+    hoverTexts.push(hoverText);
+
+    if (startTime < minTimestamp) {
+      minTimestamp = startTime;
+    }
+
+    if (startTime > maxTimestamp) {
+      maxTimestamp = startTime;
+    }
+  }
 
   return {
     x: xValues,
     y: yValues,
     mode: 'markers',
     type: 'scatter',
+    name: name,
+    visible: visible ? true : 'legendonly',
     marker: {
       color: timestamps,
       cmin: minTimestamp,
@@ -33,79 +100,43 @@ async function plotlyData(url) {
   };
 }
 
-async function createPlot(container) {
+function handleError(container, callback) {
   const loadingText = container.querySelector(".loading-text");
 
   try {
-    const title = `<b>${container.dataset.title}</b>`
-    const url = container.dataset.url;
-    const data = await plotlyData(url);
-
-    if (data.x.length == 0) {
-      loadingText.textContent = "No data yet";
-      return;
-    }
-
-    data.name = 'Races';
-
-    const layout = {
-      updatemenus: [
-        {
-          buttons: [
-            {
-              args: [{'visible': [true, false]}],
-              label: 'Races',
-              method: 'update'
-            },
-            {
-              args: [{'visible': [false, true]}],
-              label: 'Qualifications',
-              method: 'update'
-            },
-          ],
-          showactive: true,
-          type: 'buttons',
-          direction: 'right',
-          x: 0.5,
-        }
-      ],
-      showlegend: false,
-      title: title,
-      hovermode: 'closest',
-      xaxis: {
-        title: "iRating",
-      },
-      yaxis: {
-        title: {
-          text:'Best lap time',
-          standoff: 20,
-        },
-        tickformat: '%M:%S.%3f'
-      },
-    };
-
-    Plotly.newPlot(container, [data], layout, {responsive: true});
+    callback();
     loadingText.classList.add("hidden");
-
   } catch (e) {
     console.log(e);
     loadingText.textContent = "Unexpected error";
   }
-
-  // Load qualification data in the background
-  const url = container.dataset.qualificationsUrl;
-  const data = await plotlyData(url);
-
-  data.name = 'Qualifications';
-  data.visible = 'legendonly'; // Hide initially
-  data.marker.colorscale = 'Viridis';
-
-  // Add the qualification data to the plot
-  Plotly.addTraces(container, data);
 }
 
-const containers = document.querySelectorAll('.plot-container');
+async function addQualificationsTrace(container) {
+  const url = container.dataset.qualificationsUrl;
+  const trace = await buildTrace(url, 'Qualifications', false);
 
-containers.forEach(container => {
+  trace.marker.colorscale = 'Viridis';
+  Plotly.addTraces(container, [trace]);
+}
+
+async function createPlot(container) {
+  await handleError(container, async () => {
+    // Layout
+    const title = container.dataset.title;
+    const layout = createPlotlyLayout(title);
+
+    // Trace
+    const url = container.dataset.url;
+    const trace = await buildTrace(url, 'Races');
+
+    Plotly.newPlot(container, [trace], layout, {responsive: true});
+  });
+
+  // Asynchronously loads qualification data and build trace
+  addQualificationsTrace(container);
+}
+
+document.querySelectorAll('.plot-container').forEach(container => {
   createPlot(container);
 });
