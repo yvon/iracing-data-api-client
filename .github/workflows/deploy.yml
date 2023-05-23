@@ -23,6 +23,12 @@ jobs:
       - name: Build the site
         run: rake build
 
+      - name: Archive data artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: data-artifact
+          path: data/*
+
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v1
