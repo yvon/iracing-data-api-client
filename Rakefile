@@ -99,7 +99,7 @@ desc 'Fetch latest data and re-build the website'
 task update: [:remove_dynamic_data, :build]
 
 task :compile_css do
-  sh 'npx tailwindcss -o assets/app.css --minify'
+  sh 'tailwindcss -o assets/app.css --minify'
 end
 
 desc 'Build and compile the CSS'

@@ -39,6 +39,14 @@ module IracingStats
 
     private
 
+    def url_for(path)
+      URI.join(base_url, path)
+    end
+
+    def base_url
+      ENV['BASE_URL'] || 'http://localhost:8080'
+    end
+
     def content(template_file, assigns = {})
       template = File.read("./templates/#{template_file}")
       content = ERB.new(template).result(binding)

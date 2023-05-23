@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
     <title><%= ['iRacing Stats', assigns[:page_title]].compact.join(' - ') %></title>
-    <link rel="stylesheet" href="/app.css" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="stylesheet" href="<%= url_for 'app.css' %>" />
+    <link rel="icon" type="image/png" sizes="32x32" href="<%= url_for'favicon.png' %>">
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script defer type="text/javascript" src="/app.js"></script>
+    <script defer type="text/javascript" src="<%= url_for 'app.js' %>"></script>
   </head>
   <body class="antialiased bg-gray-100 text-center">
     <%= content %>
