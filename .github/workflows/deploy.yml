@@ -34,7 +34,7 @@ jobs:
           test -f data.tgz && tar -xzf data.tgz || echo "Missing data"
 
       - name: Build the site
-        run: rake build
+        run: rake update clean
 
       - name: Compress data
         run: tar -czf data.tgz data
