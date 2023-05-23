@@ -8,10 +8,10 @@ ASSETS = 'data/series/assets'
 CAR_CLASSES = 'data/carclass/get'
 SEASON_RESULTS = 'data/results/season_results?season_id=%<season_id>d&race_week_num=%<race_week>d'
 
-CHARTS_FOLDER_FORMAT = 'out/seasons/%<season_id>d/charts'
-CSV_FILE_FORMAT = 'out/seasons/%<season_id>s/charts/%<car_class_id>d/%<session_type>s.csv'
+CHARTS_FOLDER_FORMAT = '_site/seasons/%<season_id>d/charts'
+CSV_FILE_FORMAT = '_site/seasons/%<season_id>s/charts/%<car_class_id>d/%<session_type>s.csv'
 
-PAGES_PREREQUISITES = FileList['templates/*', 'lib/**', 'out', SEASONS, ASSETS, CAR_CLASSES]
+PAGES_PREREQUISITES = FileList['templates/*', 'lib/**', '_site', SEASONS, ASSETS, CAR_CLASSES]
 
 def parse_data(file)
   Rake::Task[file].invoke
@@ -22,23 +22,23 @@ def seasons
   parse_data(SEASONS)
 end
 
-directory 'out'
+directory '_site'
 
 rule %r{^data/} do |t|
   IracingStats.app.fetch_and_store(t.name)
 end
 
-file 'out/index.html' => PAGES_PREREQUISITES do |t|
+file '_site/index.html' => PAGES_PREREQUISITES do |t|
   puts t.name
   IracingStats.app.generate_index_page(t.name, seasons, parse_data(ASSETS))
 end
 
-file 'out/seasons' => PAGES_PREREQUISITES do |t|
+file '_site/seasons' => PAGES_PREREQUISITES do |t|
   assets = parse_data(ASSETS)
   car_classes = parse_data(CAR_CLASSES)
 
   seasons.each do |season|
-    html_file = "out/seasons/#{season[:season_id]}/index.html"
+    html_file = "_site/seasons/#{season[:season_id]}/index.html"
     IracingStats.app.generate_season_page(html_file, season, assets, car_classes)
   end
 
@@ -78,17 +78,17 @@ desc 'Generate charts data files'
 task charts: [:prepare_charts, :async_charts]
 
 desc 'Generate the index page'
-task index: 'out/index.html'
+task index: '_site/index.html'
 
 desc 'Generate season pages'
-task season_pages: 'out/seasons'
+task season_pages: '_site/seasons'
 
 desc 'Generate all HTML content'
 task pages: [:index, :season_pages]
 
 desc 'Copy the assets'
-task assets: :out do
-  cp Dir['assets/*'], 'out'
+task assets: :_site do
+  cp Dir['assets/*'], '_site'
 end
 
 desc 'Generate the whole website'
