@@ -40,11 +40,11 @@ module IracingStats
     private
 
     def url_for(path)
-      URI.join(base_url, path)
+      File.join(base_url, path)
     end
 
     def base_url
-      ENV['BASE_URL'] || 'http://localhost:8080'
+      ENV['BASE_URL'] || '/'
     end
 
     def content(template_file, assigns = {})

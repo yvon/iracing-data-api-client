@@ -6,7 +6,7 @@
 <ul class="pt-7 pb-12 flex flex-wrap justify-center gap-4 bg-white m-auto px-3">
   <% assigns[:seasons].each do |season| %>
     <li class="w-64">
-      <a href="<%= "seasons/#{season[:season_id]}" %>">
+      <a href="<%= url_for("seasons/#{season[:season_id]}") %>">
         <%-
           id = season[:series_id].to_s
           logo = assigns[:assets][id.to_sym][:logo]
