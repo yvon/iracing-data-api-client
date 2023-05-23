@@ -23,15 +23,6 @@ jobs:
         with:
           ruby-version: '3.2.2'
 
-      - name: Configure cache
-        id: cache-data
-        uses: actions/cache@v3
-        with:
-          path: data.tgz
-          key: data-${{ github.run_id }}
-          restore-keys: |
-            data-
-
       - name: Configure cache for data directory
         id: cache-data-dir
         uses: actions/cache@v3
@@ -41,15 +32,8 @@ jobs:
           restore-keys: |
             data-dir-
 
-      - name: Extract data
-        run: |
-          test -f data.tgz && tar -xzf data.tgz || echo "Missing data"
-
       - name: Build the site
         run: rake -j 4 update clean
-
-      - name: Compress data
-        run: tar -czf data.tgz data
 
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
