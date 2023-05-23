@@ -27,7 +27,8 @@ module IracingStats
             result['best_lap_time'],
             data['start_time'],
             result['display_name'],
-            result['car_name']
+            result['car_name'],
+            result['average_lap']
           ]
 
           block.call(keys, content)

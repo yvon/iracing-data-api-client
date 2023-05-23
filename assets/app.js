@@ -14,10 +14,6 @@ function createPlotlyLayout(title) {
     },
 
     yaxis: {
-      title: {
-        text:'Best lap time',
-        standoff: 20,
-      },
       tickformat: '%M:%S.%3f'
     },
 
@@ -25,12 +21,17 @@ function createPlotlyLayout(title) {
       {
         buttons: [
           {
-            args: [{'visible': [true, false]}],
-            label: 'Races',
+            args: [{'visible': [true, false, false]}],
+            label: 'Best lap times',
             method: 'update'
           },
           {
-            args: [{'visible': [false, true]}],
+            args: [{'visible': [false, true, false]}],
+            label: 'Average lap times',
+            method: 'update'
+          },
+          {
+            args: [{'visible': [false, false, true]}],
             label: 'Qualifications',
             method: 'update'
           },
@@ -47,10 +48,11 @@ function createPlotlyLayout(title) {
 function parseCSVData(csvData) {
   return d3.csvParseRows(csvData, d => ({
     irating: +d[0],
-    lapTime: new Date(+d[1] / 10),
+    bestLapTime: new Date(+d[1] / 10),
     startTime: new Date(d[2]).getTime(),
     displayName: d[3],
     carName: d[4],
+    averageLapTime: new Date(+d[5] / 10),
   }));
 }
 
@@ -60,20 +62,17 @@ async function getDataPoints(url) {
   return parseCSVData(csvData);
 }
 
-async function buildTrace(url, name, visible = true) {
-  const points = await getDataPoints(url);
-
+async function buildTrace(points, colorscale, lapTimeAttr, visible = true) {
   const xValues = [], yValues = [], timestamps = [], hoverTexts = [];
   let minTimestamp = Infinity, maxTimestamp = -Infinity;
 
   for (const point of points) {
-    const hoverText = createHoverText(point);
-    const { irating, lapTime, startTime } = point;
+    const { irating, startTime } = point;
 
     xValues.push(irating);
-    yValues.push(lapTime);
+    yValues.push(point[lapTimeAttr]);
     timestamps.push(startTime);
-    hoverTexts.push(hoverText);
+    hoverTexts.push(createHoverText(point));
 
     if (startTime < minTimestamp) {
       minTimestamp = startTime;
@@ -89,12 +88,12 @@ async function buildTrace(url, name, visible = true) {
     y: yValues,
     mode: 'markers',
     type: 'scatter',
-    name: name,
     visible: visible ? true : 'legendonly',
     marker: {
       color: timestamps,
       cmin: minTimestamp,
       cmax: maxTimestamp,
+      colorscale: colorscale,
     },
     hovertext: hoverTexts,
   };
@@ -113,24 +112,22 @@ function handleError(container, callback) {
 }
 
 async function addQualificationsTrace(container) {
-  const url = container.dataset.qualificationsUrl;
-  const trace = await buildTrace(url, 'Qualifications', false);
+  const points = await getDataPoints(container.dataset.qualificationsUrl);
+  const trace = await buildTrace(points, 'Greens', 'bestLapTime', false);
 
-  trace.marker.colorscale = 'Viridis';
   Plotly.addTraces(container, [trace]);
 }
 
 async function createPlot(container) {
   await handleError(container, async () => {
-    // Layout
     const title = container.dataset.title;
     const layout = createPlotlyLayout(title);
+    const points = await getDataPoints(container.dataset.url);
 
-    // Trace
-    const url = container.dataset.url;
-    const trace = await buildTrace(url, 'Races');
+    const bestLapTimes = await buildTrace(points, 'Reds', 'bestLapTime');
+    const averageLapTimes = await buildTrace(points, 'YlGnBu', 'averageLapTime', false);
 
-    Plotly.newPlot(container, [trace], layout, {responsive: true});
+    Plotly.newPlot(container, [bestLapTimes, averageLapTimes], layout, {responsive: true});
   });
 
   // Asynchronously loads qualification data and build trace
