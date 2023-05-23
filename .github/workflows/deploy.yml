@@ -10,6 +10,8 @@ jobs:
     env:
       IRACING_EMAIL: ${{ secrets.IRACING_EMAIL }}
       IRACING_PASSWORD: ${{ secrets.IRACING_PASSWORD }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       BASE_URL: "https://yvon.github.io/iracing-data-api-client/"
 
     steps:
@@ -21,9 +23,9 @@ jobs:
           ruby-version: '3.2.2'
 
       - name: Download previous data
-        uses: actions/download-artifact@v3
+        uses: s3-actions/aws-cli@v1
         with:
-          name: data-artifact
+          aws-command: s3 cp s3://iracing-data/data.tgz data.tgz
         continue-on-error: true
 
       - name: Extract data
@@ -38,10 +40,9 @@ jobs:
         run: tar -czf data.tgz data
 
       - name: Archive data
-        uses: actions/upload-artifact@v3
+        uses: s3-actions/aws-cli@v1
         with:
-          name: data-artifact
-          path: data.tgz
+          aws-command: s3 cp data.tgz s3://iracing-data/data.tgz
 
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
