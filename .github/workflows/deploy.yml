@@ -20,13 +20,24 @@ jobs:
         with:
           ruby-version: '3.2.2'
 
+      - name: Download previous data
+        uses: actions/download-artifact@v3
+        with:
+          name: data-artifact
+        continue-on-error: true
+
+      - name: Extract data
+        run: |
+          mkdir -p data
+          test -f data.tgz && tar -xzf data.tgz || echo "Missing artifact"
+
       - name: Build the site
         run: rake build
 
       - name: Compress data
         run: tar -czf data.tgz data
 
-      - name: Archive data artifact
+      - name: Archive data
         uses: actions/upload-artifact@v3
         with:
           name: data-artifact
