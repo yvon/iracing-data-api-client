@@ -1,3 +1,11 @@
+// As a proof of concept, done in JS. Data should be preprocessed in Ruby.
+function get98thPercentile(points, lapTimeAttr) {
+  const times = points.map(point => point[lapTimeAttr]);
+  times.sort((a, b) => a - b);
+  const percentileIndex = Math.ceil(times.length * 0.98) - 1;
+  return times[percentileIndex];
+}
+
 function createHoverText(data) {
   const { displayName, carName, startTime } = data;
   return `${displayName}<br>${carName}<br>${new Date(startTime).toString()}`;
@@ -71,23 +79,26 @@ async function getDataPoints(url) {
 }
 
 async function buildTrace(points, colorscale, lapTimeAttr, visible = true) {
+  const global98thPercentile = get98thPercentile(points, lapTimeAttr);
   const xValues = [], yValues = [], timestamps = [], hoverTexts = [];
   let minTimestamp = Infinity, maxTimestamp = -Infinity;
 
   for (const point of points) {
     const { irating, startTime } = point;
+    // Filter out outliers
+    if (point[lapTimeAttr] <= global98thPercentile) {
+      xValues.push(irating);
+      yValues.push(point[lapTimeAttr]);
+      timestamps.push(startTime);
+      hoverTexts.push(createHoverText(point));
 
-    xValues.push(irating);
-    yValues.push(point[lapTimeAttr]);
-    timestamps.push(startTime);
-    hoverTexts.push(createHoverText(point));
+      if (startTime < minTimestamp) {
+        minTimestamp = startTime;
+      }
 
-    if (startTime < minTimestamp) {
-      minTimestamp = startTime;
-    }
-
-    if (startTime > maxTimestamp) {
-      maxTimestamp = startTime;
+      if (startTime > maxTimestamp) {
+        maxTimestamp = startTime;
+      }
     }
   }
 
