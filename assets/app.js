@@ -152,7 +152,7 @@ async function createPlot(container) {
     const traces = [
       await buildTrace(raceData, bestLapsScale, 'bestLapTime'),
       await buildTrace(raceData, averageLapsScale, 'averageLapTime', false),
-      await buildTrace(qualificationData, qualificationsScale, 'averageLapTime', false),
+      await buildTrace(qualificationData, qualificationsScale, 'bestLapTime', false),
     ];
 
     Plotly.newPlot(container, traces, layout, plotConfig);
