@@ -99,11 +99,11 @@ async function buildTrace(points, colorscale, lapTimeAttr, visible = true) {
   };
 }
 
-function handleError(container, callback) {
+async function handleError(container, callback) {
   const loadingText = container.querySelector(".loading-text");
 
   try {
-    callback();
+    await callback();
     loadingText.classList.add("hidden");
   } catch (e) {
     console.log(e);
@@ -111,27 +111,40 @@ function handleError(container, callback) {
   }
 }
 
-async function addQualificationsTrace(container) {
-  const points = await getDataPoints(container.dataset.qualificationsUrl);
-  const trace = await buildTrace(points, 'Greens', 'bestLapTime', false);
+const bestLapsScale = [
+  [0, '#a39796']
+  [1, '#a61100'],
+];
 
-  Plotly.addTraces(container, [trace]);
-}
+const averageLapsScale = [
+  [0, '#8ca8ad']
+  [1, '#046580'],
+];
+
+const qualificationsScale = [
+  [0, '#a39796']
+  [1, '#004040'],
+];
+
 
 async function createPlot(container) {
-  await handleError(container, async () => {
+  handleError(container, async () => {
     const title = container.dataset.title;
     const layout = createPlotlyLayout(title);
-    const points = await getDataPoints(container.dataset.url);
 
-    const bestLapTimes = await buildTrace(points, 'Reds', 'bestLapTime');
-    const averageLapTimes = await buildTrace(points, 'YlGnBu', 'averageLapTime', false);
+    const [raceData, qualificationData]  = await Promise.all([
+      getDataPoints(container.dataset.url),
+      getDataPoints(container.dataset.qualificationsUrl)
+    ]);
 
-    Plotly.newPlot(container, [bestLapTimes, averageLapTimes], layout, {responsive: true});
+    const traces = [
+      await buildTrace(raceData, bestLapsScale, 'bestLapTime'),
+      await buildTrace(raceData, averageLapsScale, 'averageLapTime', false),
+      await buildTrace(qualificationData, qualificationsScale, 'averageLapTime', false),
+    ];
+
+    Plotly.newPlot(container, traces, layout, {responsive: true});
   });
-
-  // Asynchronously loads qualification data and build trace
-  addQualificationsTrace(container);
 }
 
 document.querySelectorAll('.plot-container').forEach(container => {
