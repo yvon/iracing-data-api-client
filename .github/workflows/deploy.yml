@@ -14,6 +14,8 @@ jobs:
       IRACING_EMAIL: ${{ secrets.IRACING_EMAIL }}
       IRACING_PASSWORD: ${{ secrets.IRACING_PASSWORD }}
       BASE_URL: "https://yvon.github.io/iracing-data-api-client/"
+    timeout-minutes: 10
+    retries: 3
 
     steps:
       - uses: actions/checkout@v3
