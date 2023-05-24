@@ -119,20 +119,9 @@ async function handleError(container, callback) {
   }
 }
 
-const bestLapsScale = [
-  [0, '#a39796'],
-  [1, '#a61100'],
-];
-
-const averageLapsScale = [
-  [0, '#8ca8ad'],
-  [1, '#046580'],
-];
-
-const qualificationsScale = [
-  [0, '#a39796'],
-  [1, '#004040'],
-];
+const bestLapsScale = null; // use default
+const averageLapsScale = 'Greys';
+const qualificationsScale = 'Viridis';
 
 const plotConfig = {
   responsive: true,
