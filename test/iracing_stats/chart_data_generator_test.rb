@@ -1,7 +1,7 @@
 require 'test/unit'
 require './lib/iracing_stats/chart_data_generator'
 
-class ChartDataGeneratorTest < Test::Unit::TestCase
+class TestChartDataGenerator < Test::Unit::TestCase
   def setup
     @chart_data_generator = IracingStats::ChartDataGenerator.new
   end
