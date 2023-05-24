@@ -1,9 +1,9 @@
 name: Deploy to Pages
 
 on:
-  push:
-    branches: [ "main" ]
-  # Every hour
+  # Manual deploy
+  workflow_dispatch:
+  # Scheduled one, every hour
   schedule:
     - cron: "30 * * * *"
 
