@@ -10,7 +10,7 @@ function createPlotlyLayout(title) {
     hovermode: 'closest',
 
     margin: {
-      l: 50,
+      l: 55,
       r: 10,
     },
 
