@@ -9,6 +9,11 @@ function createPlotlyLayout(title) {
     showlegend: false,
     hovermode: 'closest',
 
+    margin: {
+      l: 50,
+      r: 10,
+    },
+
     xaxis: {
       title: "iRating",
     },
@@ -22,12 +27,12 @@ function createPlotlyLayout(title) {
         buttons: [
           {
             args: [{'visible': [true, false, false]}],
-            label: 'Best lap times',
+            label: 'Best laps',
             method: 'update'
           },
           {
             args: [{'visible': [false, true, false]}],
-            label: 'Average lap times',
+            label: 'Average laps',
             method: 'update'
           },
           {
@@ -38,8 +43,11 @@ function createPlotlyLayout(title) {
         ],
         showactive: true,
         type: 'buttons',
-        direction: 'right',
-        x: 0.5,
+        direction: 'down',
+        xanchor: 'right',
+        yanchor: 'top',
+        x: 1,
+        y: 1
       }
     ],
   };
@@ -126,6 +134,10 @@ const qualificationsScale = [
   [1, '#004040'],
 ];
 
+const plotConfig = {
+  responsive: true,
+  displayModeBar: false
+};
 
 async function createPlot(container) {
   handleError(container, async () => {
@@ -143,7 +155,7 @@ async function createPlot(container) {
       await buildTrace(qualificationData, qualificationsScale, 'averageLapTime', false),
     ];
 
-    Plotly.newPlot(container, traces, layout, {responsive: true});
+    Plotly.newPlot(container, traces, layout, plotConfig);
   });
 }
 
