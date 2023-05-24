@@ -1,10 +1,10 @@
 require_relative 'iracing_stats/app'
 
 module IracingStats
-  @@mutex = Mutex.new
+  @mutex = Mutex.new
 
   def self.app
-    @@mutex.synchronize do
+    @mutex.synchronize do
       @app ||= App.new
     end
   end
