@@ -11,6 +11,13 @@ SEASON_RESULTS = 'data/results/season_results?season_id=%<season_id>d&race_week_
 CHARTS_FOLDER_FORMAT = '_site/seasons/%<season_id>d/charts'
 CSV_FILE_FORMAT = '_site/seasons/%<season_id>s/charts/%<car_class_id>d/%<session_type>s.csv'
 
+RENEWABLE_FILES = Rake::FileList[
+  SEASONS,
+  ASSETS,
+  CAR_CLASSES,
+  'data/results/season_results*'
+].existing
+
 PAGES_PREREQUISITES = FileList['templates/*', 'lib/**', '_site', SEASONS, ASSETS, CAR_CLASSES]
 
 def parse_data(file)
@@ -47,9 +54,8 @@ end
 
 desc 'Remove cached files that are regularly updated'
 task :remove_dynamic_data do
-  files = Rake::FileList['data/series/seasons', 'data/results/season_results*'].existing
-  FileUtils.rm files, force: true
-  puts "#{files.size} files deleted"
+  FileUtils.rm RENEWABLE_FILES, force: true
+  puts "#{RENEWABLE_FILES.size} files deleted"
 end
 
 multitask :async_charts
