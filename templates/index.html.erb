@@ -16,3 +16,13 @@
     </li>
   <% end %>
 </ul>
+
+<ul class="flex flex-col gap-1 py-10">
+  <% assigns[:seasons].each do |season| %>
+    <li>
+      <a href="<%= url_for("seasons/#{season[:season_id]}") %>">
+        <%= season[:season_name] %>
+      </a>
+    </li>
+  <% end %>
+</ul>
